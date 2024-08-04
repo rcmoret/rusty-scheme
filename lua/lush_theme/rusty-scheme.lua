@@ -45,6 +45,67 @@
 local lush = require('lush')
 local hsl = lush.hsl
 
+local base = hsl(232, 90, 68)
+
+local colors = {
+  orange = {
+    primary = hsl(22, 100, 73),
+    secondary = hsl(22, 100, 78),
+    dark_variant = hsl(22, 20, 35)
+  },
+  yellow = {
+    primary = hsl(52, 40, 67),
+    -- primary = hsl(52, 84, 87),
+    bold = hsl(52, 100, 75),
+  },
+  chartreuse = {
+    primary = hsl(112, 28, 58),
+  },
+  green = {
+    primary = hsl(142, 30, 38),
+  },
+  cyan = {
+    primary = hsl(172, 90, 30),
+  },
+  sky = {
+    primary = hsl(202, 70, 68),
+    -- primary = hsl(202, 90, 68),
+    light = hsl(202, 70, 82),
+    ultralight = hsl(202, 100, 96)
+  },
+  blue = { primary = hsl(232, 100, 73), },
+  purple = {
+    primary = hsl(262, 67, 77),
+    test = base.rotate(30).li(28).sa(10),
+  },
+  fuchsia = { primary = base.rotate(60).da(-3).sa(10)  },
+  magenta = { primary = hsl(322, 50, 74) },
+  red = {
+    primary = hsl(352, 80, 68),
+    bold = hsl(352, 70, 42),
+  },
+  gray = {
+    [0] = hsl(202, 8, 98),
+    [100] = hsl(202, 8, 85),
+    [200] = hsl(202, 8, 75),
+    [300] = hsl(202, 10, 65),
+    [400] = hsl(202, 12, 55),
+    [500] = hsl(202, 15, 45),
+    [600] = hsl(202, 17, 35),
+    [700] = hsl(202, 22, 25),
+    [800] = hsl(202, 22, 20),
+    [900] = hsl(202, 24, 17),
+    [950] = hsl(202, 25, 13),
+    [1000] = hsl(202, 30, 10)
+  }
+}
+
+local get_color = function(name, supplied_variant)
+  local variant = supplied_variant or "primary"
+  return colors[name][variant]
+end
+
+
 -- LSP/Linters mistakenly show `undefined global` errors in the spec, they may
 -- support an annotation like the following. Consult your server documentation.
 ---@diagnostic disable: undefined-global
@@ -61,15 +122,15 @@ local theme = lush(function(injected_functions)
     --
     -- See :h highlight-groups
     --
-    -- ColorColumn    { }, -- Columns set with 'colorcolumn'
+    -- ColorColumn    { bg = colors.extra_light }, -- Columns set with 'colorcolumn'
     -- Conceal        { }, -- Placeholder characters substituted for concealed text (see 'conceallevel')
-    -- Cursor         { }, -- Character under the cursor
-    -- CurSearch      { }, -- Highlighting a search pattern under the cursor (see 'hlsearch')
+    Cursor         { bg = get_color("yellow"), fg = get_color("gray", 800) }, -- Character under the cursor
+    CurSearch      { bg = get_color("sky", "light"), fg = get_color("gray", 800) },
     -- lCursor        { }, -- Character under the cursor when |language-mapping| is used (see 'guicursor')
     -- CursorIM       { }, -- Like Cursor, but used when in IME mode |CursorIM|
-    -- CursorColumn   { }, -- Screen-column at the cursor, when 'cursorcolumn' is set.
-    -- CursorLine     { }, -- Screen-line at the cursor, when 'cursorline' is set. Low-priority if foreground (ctermfg OR guifg) is not set.
-    -- Directory      { }, -- Directory names (and other special names in listings)
+    CursorColumn   { bg = get_color("gray", 950) }, -- Screen-column at the cursor, when 'cursorcolumn' is set.
+    -- CursorLine     {}, -- Screen-line at the cursor, when 'cursorline' is set. Low-priority if foreground (ctermfg OR guifg) is not set.
+    Directory      { fg = get_color("sky") }, -- Directory names (and other special names in listings)
     -- DiffAdd        { }, -- Diff mode: Added line |diff.txt|
     -- DiffChange     { }, -- Diff mode: Changed line |diff.txt|
     -- DiffDelete     { }, -- Diff mode: Deleted line |diff.txt|
@@ -81,57 +142,70 @@ local theme = lush(function(injected_functions)
     -- VertSplit      { }, -- Column separating vertically split windows
     -- Folded         { }, -- Line used for closed folds
     -- FoldColumn     { }, -- 'foldcolumn'
-    -- SignColumn     { }, -- Column where |signs| are displayed
+    SignColumn     { bg = get_color("gray", 950) }, -- Column where |signs| are displayed
+    GitSignsAdd { SignColumn, fg = get_color("green") },
+    GitSignsChange { SignColumn, fg = get_color("gray", 600) },
+    GitSignsDelete { SignColumn, fg = get_color("red", "bold") },
     -- IncSearch      { }, -- 'incsearch' highlighting; also used for the text replaced with ":s///c"
     -- Substitute     { }, -- |:substitute| replacement text highlighting
-    -- LineNr         { }, -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
-    -- LineNrAbove    { }, -- Line number for when the 'relativenumber' option is set, above the cursor line
-    -- LineNrBelow    { }, -- Line number for when the 'relativenumber' option is set, below the cursor line
-    -- CursorLineNr   { }, -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
+    -- LineNr         { bg = colors.gray[950], fg = get_color("cyan") }, -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
+    LineNr         { bg = colors.gray[950], fg = get_color("orange", "dark_variant") }, -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
+    -- LineNrAbove    { bg = colors.gray[950], fg = get_color("orange", "dark_variant") }, -- Line number for when the 'relativenumber' option is set, above the cursor line
+    -- LineNrBelow    { bg = colors.gray[950], fg = get_color("orange", "dark_variant") }, -- Line number for when the 'relativenumber' option is set, below the cursor line
+    -- CursorLineNr   { bg = colors.gray[950], fg = get_color("gray", 200) }, -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
+    CursorLineNr   { bg = colors.gray[950], fg = get_color("orange", "secondary") }, -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
     -- CursorLineFold { }, -- Like FoldColumn when 'cursorline' is set for the cursor line
     -- CursorLineSign { }, -- Like SignColumn when 'cursorline' is set for the cursor line
     -- MatchParen     { }, -- Character under the cursor or just before it, if it is a paired bracket, and its match. |pi_paren.txt|
     -- ModeMsg        { }, -- 'showmode' message (e.g., "-- INSERT -- ")
-    -- MsgArea        { }, -- Area for messages and cmdline
-    -- MsgSeparator   { }, -- Separator for scrolled messages, `msgsep` flag of 'display'
-    -- MoreMsg        { }, -- |more-prompt|
-    -- NonText        { }, -- '@' at the end of the window, characters from 'showbreak' and other characters that do not really exist in the text (e.g., ">" displayed when a double-wide character doesn't fit at the end of the line). See also |hl-EndOfBuffer|.
-    -- Normal         { }, -- Normal text
-    -- NormalFloat    { }, -- Normal text in floating windows.
-    -- FloatBorder    { }, -- Border of floating windows.
-    -- FloatTitle     { }, -- Title of floating windows.
-    -- NormalNC       { }, -- normal text in non-current windows
-    -- Pmenu          { }, -- Popup menu: Normal item.
-    -- PmenuSel       { }, -- Popup menu: Selected item.
-    -- PmenuKind      { }, -- Popup menu: Normal item "kind"
-    -- PmenuKindSel   { }, -- Popup menu: Selected item "kind"
+    MsgArea        { bg = get_color("gray", 500) }, -- Area for messages and cmdline
+    MoreMsg        { MsgArea }, -- |more-prompt|
+    Normal         { bg = get_color("gray", 1000), fg = get_color("sky", "ultralight") }, -- Normal text
+    NormalFloat    { bg = get_color("gray", 900), fg = get_color("gray", 0), }, -- Normal text in floating windows.
+    FloatShadow    { NormalFloat }, -- Normal text in floating windows.
+    FloatShadowThrough    { NormalFloat }, -- Normal text in floating windows.
+    FloatBorder    { NormalFloat, fg = get_color("magenta") }, -- Border of floating windows.
+    FloatTitle     { NormalFloat }, -- Title of floating windows.
+    -- NonText        {  NormalFloat }, -- '@' at the end of the window, characters from 'showbreak' and other characters that do not really exist in the text (e.g., ">" displayed when a double-wide character doesn't fit at the end of the line). See also |hl-EndOfBuffer|.
+    -- NormalNC       { bg = get_color("gray", 800) }, -- normal text in non-current windows
+    MsgSeparator   { NormalFloat }, -- Separator for scrolled messages, `msgsep` flag of 'display'
+    Pmenu          { bg = get_color("gray", 900) }, -- Popup menu: Normal item.
+    PmenuSel       { bg = get_color("gray", 500), fg = get_color("sky", "light") }, -- Popup menu: Selected item.
+    CmpSelect      { bg = get_color("gray", 500), fg = get_color("sky", "light") },
+    CmpItemAbbrMatch { fg = get_color("yellow") },
+    PmenuKind      { fg = get_color("magenta") }, -- Popup menu: Normal item "kind"
+    PmenuKindSel   { fg = get_color("magenta") }, -- Popup menu: Selected item "kind"
     -- PmenuExtra     { }, -- Popup menu: Normal item "extra text"
     -- PmenuExtraSel  { }, -- Popup menu: Selected item "extra text"
-    -- PmenuSbar      { }, -- Popup menu: Scrollbar.
+    PmenuSbar      { bg = get_color("gray", 800) }, -- Popup menu: Scrollbar.
     -- PmenuThumb     { }, -- Popup menu: Thumb of the scrollbar.
     -- Question       { }, -- |hit-enter| prompt and yes/no questions
     -- QuickFixLine   { }, -- Current |quickfix| item in the quickfix window. Combined with |hl-CursorLine| when the cursor is there.
-    -- Search         { }, -- Last search pattern highlighting (see 'hlsearch'). Also used for similar items that need to stand out.
+    Search         { CurSearch }, -- Last search pattern highlighting (see 'hlsearch'). Also used for similar items that need to stand out.
     -- SpecialKey     { }, -- Unprintable characters: text displayed differently from what it really is. But not 'listchars' whitespace. |hl-Whitespace|
-    -- SpellBad       { }, -- Word that is not recognized by the spellchecker. |spell| Combined with the highlighting used otherwise.
+    -- SpellBad       { undercurl = "true" }, -- Word that is not recognized by the spellchecker. |spell| Combined with the highlighting used otherwise.
     -- SpellCap       { }, -- Word that should start with a capital. |spell| Combined with the highlighting used otherwise.
     -- SpellLocal     { }, -- Word that is recognized by the spellchecker as one that is used in another region. |spell| Combined with the highlighting used otherwise.
     -- SpellRare      { }, -- Word that is recognized by the spellchecker as one that is hardly ever used. |spell| Combined with the highlighting used otherwise.
-    -- StatusLine     { }, -- Status line of current window
-    -- StatusLineNC   { }, -- Status lines of not-current windows. Note: If this is equal to "StatusLine" Vim will use "^^^" in the status line of the current window.
-    -- TabLine        { }, -- Tab pages line, not active tab page label
-    -- TabLineFill    { }, -- Tab pages line, where there are no labels
+    StatusLine     { NormalFloat }, -- Status line of current window
+    StatusLineNC   { NormalFloat }, -- Status lines of not-current windows. Note: If this is equal to "StatusLine" Vim will use "^^^" in the status line of the current window.
+    TabLine        { NormalFloat }, -- Tab pages line, not active tab page label
+    TabLineFill    { NormalFloat }, -- Tab pages line, where there are no labels
     -- TabLineSel     { }, -- Tab pages line, active tab page label
     -- Title          { }, -- Titles for output from ":set all", ":autocmd" etc.
-    -- Visual         { }, -- Visual mode selection
-    -- VisualNOS      { }, -- Visual mode selection when vim is "Not Owning the Selection".
-    -- WarningMsg     { }, -- Warning messages
+    Visual         { bg = get_color("gray", 700) }, -- Visual mode selection
+    VisualNOS      { Visual }, -- Visual mode selection when vim is "Not Owning the Selection".
+    WarningMsg     { Visual }, -- Warning messages
     -- Whitespace     { }, -- "nbsp", "space", "tab" and "trail" in 'listchars'
-    -- Winseparator   { }, -- Separator between window splits. Inherts from |hl-VertSplit| by default, which it will replace eventually.
+    Winseparator   { NormalFloat, fg = get_color("gray", 600) }, -- Separator between window splits. Inherts from |hl-VertSplit| by default, which it will replace eventually.
     -- WildMenu       { }, -- Current match in 'wildmenu' completion
     -- WinBar         { }, -- Window bar of current window
     -- WinBarNC       { }, -- Window bar of not-current windows
+    LspCodeLens = { NormalFloat, fg= get_color("gray", 300) },
+    LspInfoBorder = { NormalFloat },
+    LspInfoFiletype = { bg = get_color("gray", 400), fg = get_color("magenta") },
 
+    NvimFloat { NormalFloat, fg = get_color("chartreuse") },
     -- Common vim syntax groups used for all kinds of code and markup.
     -- Commented-out groups should chain up to their preferred (*) group
     -- by default.
@@ -140,30 +214,31 @@ local theme = lush(function(injected_functions)
     --
     -- Uncomment and edit if you want more specific syntax highlighting.
 
-    -- Comment        { }, -- Any comment
+    Comment        { fg = get_color("gray", 600), gui = "italic" }, -- Any comment
 
-    -- Constant       { }, -- (*) Any constant
-    -- String         { }, --   A string constant: "this is a string"
-    -- Character      { }, --   A character constant: 'c', '\n'
-    -- Number         { }, --   A number constant: 234, 0xff
-    -- Boolean        { }, --   A boolean constant: TRUE, false
-    -- Float          { }, --   A floating point constant: 2.3e10
+    PreProc        { fg = get_color("purple").li(20) }, -- (*) Generic Preprocessor
+    Constant       { fg = get_color("chartreuse") }, -- (*) Any constant
+    -- Constant       { fg = get_color("chartreuse").li(30).de(50) }, -- (*) Any constant
+    String         { fg = get_color("blue") }, --   A string constant: "this is a string"
+    Number         { fg = get_color("blue") }, --   A number constant: 234, 0xff
+    Boolean        { fg = get_color("red"), gui = "italic" }, --   A boolean constant: TRUE, fals
+    Identifier     { fg = get_color("sky") },
 
-    -- Identifier     { }, -- (*) Any variable name
-    -- Function       { }, --   Function name (also: methods for classes)
+    Function       { fg = get_color("gray", 0) }, --   Function name (also: methods for classes)
 
-    -- Statement      { }, -- (*) Any statement
-    -- Conditional    { }, --   if, then, else, endif, switch, etc.
+    Statement      { fg = get_color("orange", "secondary") }, -- (*) Any statement
+    Character      { fg = get_color("gray", 200) }, --   A character constant: 'c', '\n'
+    Conditional    { fg = get_color("red"), gui = "underline" }, --   if, then, else, endif, switch, etc.
     -- Repeat         { }, --   for, do, while, etc.
     -- Label          { }, --   case, default, etc.
-    -- Operator       { }, --   "sizeof", "+", "*", etc.
-    -- Keyword        { }, --   any other keyword
-    -- Exception      { }, --   try, catch, throw
+    Operator       { fg = get_color("gray", 0) }, --   "sizeof", "+", "*", etc.
+    Keyword        { fg = get_color("purple") }, --   any other keyword
+    Exception      { fg = get_color("orange") }, --   try, catch, throw
 
     -- PreProc        { }, -- (*) Generic Preprocessor
-    -- Include        { }, --   Preprocessor #include
-    -- Define         { }, --   Preprocessor #define
-    -- Macro          { }, --   Same as Define
+    Include        { fg = get_color("yellow"), gui = "italic" }, --   Preprocessor #include
+    Define         { fg = get_color("magenta"), gui = "undercurl" }, --   Preprocessor #define
+    Macro          { fg = get_color("yellow"),  gui = "italic" }, --   Same as Define
     -- PreCondit      { }, --   Preprocessor #if, #else, #endif, etc.
 
     -- Type           { }, -- (*) int, long, char, etc.
@@ -178,10 +253,10 @@ local theme = lush(function(injected_functions)
     -- SpecialComment { }, --   Special things inside a comment (e.g. '\n')
     -- Debug          { }, --   Debugging statements
 
-    -- Underlined     { gui = "underline" }, -- Text that stands out, HTML links
+    Underlined     { gui = "underline" }, -- Text that stands out, HTML links
     -- Ignore         { }, -- Left blank, hidden |hl-Ignore| (NOTE: May be invisible here in template)
-    -- Error          { }, -- Any erroneous construct
-    -- Todo           { }, -- Anything that needs extra attention; mostly the keywords TODO FIXME and XXX
+    Error          { bg = get_color("red", "bold"), fg = get_color("gray", 200) }, -- Any erroneous construct
+    Todo           { bg = get_color("gray", 700), fg = get_color("sky", "light") }, -- Anything that needs extra attention; mostly the keywords TODO FIXME and XXX
 
     -- These groups are for the native LSP client and diagnostic system. Some
     -- other LSP clients may use these groups, or use their own. Consult your
@@ -198,31 +273,31 @@ local theme = lush(function(injected_functions)
 
     -- See :h diagnostic-highlights, some groups may not be listed, submit a PR fix to lush-template!
     --
-    -- DiagnosticError            { } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
-    -- DiagnosticWarn             { } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
-    -- DiagnosticInfo             { } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
-    -- DiagnosticHint             { } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
-    -- DiagnosticOk               { } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
-    -- DiagnosticVirtualTextError { } , -- Used for "Error" diagnostic virtual text.
-    -- DiagnosticVirtualTextWarn  { } , -- Used for "Warn" diagnostic virtual text.
-    -- DiagnosticVirtualTextInfo  { } , -- Used for "Info" diagnostic virtual text.
-    -- DiagnosticVirtualTextHint  { } , -- Used for "Hint" diagnostic virtual text.
-    -- DiagnosticVirtualTextOk    { } , -- Used for "Ok" diagnostic virtual text.
-    -- DiagnosticUnderlineError   { } , -- Used to underline "Error" diagnostics.
-    -- DiagnosticUnderlineWarn    { } , -- Used to underline "Warn" diagnostics.
-    -- DiagnosticUnderlineInfo    { } , -- Used to underline "Info" diagnostics.
-    -- DiagnosticUnderlineHint    { } , -- Used to underline "Hint" diagnostics.
-    -- DiagnosticUnderlineOk      { } , -- Used to underline "Ok" diagnostics.
-    -- DiagnosticFloatingError    { } , -- Used to color "Error" diagnostic messages in diagnostics float. See |vim.diagnostic.open_float()|
-    -- DiagnosticFloatingWarn     { } , -- Used to color "Warn" diagnostic messages in diagnostics float.
-    -- DiagnosticFloatingInfo     { } , -- Used to color "Info" diagnostic messages in diagnostics float.
-    -- DiagnosticFloatingHint     { } , -- Used to color "Hint" diagnostic messages in diagnostics float.
-    -- DiagnosticFloatingOk       { } , -- Used to color "Ok" diagnostic messages in diagnostics float.
-    -- DiagnosticSignError        { } , -- Used for "Error" signs in sign column.
-    -- DiagnosticSignWarn         { } , -- Used for "Warn" signs in sign column.
-    -- DiagnosticSignInfo         { } , -- Used for "Info" signs in sign column.
-    -- DiagnosticSignHint         { } , -- Used for "Hint" signs in sign column.
-    -- DiagnosticSignOk           { } , -- Used for "Ok" signs in sign column.
+    DiagnosticError            {  } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
+    DiagnosticWarn             {  } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
+    DiagnosticInfo             {  } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
+    DiagnosticHint             {  } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
+    DiagnosticOk               {  } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
+    DiagnosticVirtualTextError { fg = get_color("red", "bold") } , -- Used for "Error" diagnostic virtual text.
+    DiagnosticVirtualTextWarn  { fg = get_color("yellow", "bold"), gui = "italic" } , -- Used for "Warn" diagnostic virtual text.
+    DiagnosticVirtualTextInfo  { fg = get_color("sky") } , -- Used for "Info" diagnostic virtual text.
+    DiagnosticVirtualTextHint  { fg = get_color("purple")} , -- Used for "Hint" diagnostic virtual text.
+    DiagnosticVirtualTextOk    { fg = get_color("chartreuse") } , -- Used for "Ok" diagnostic virtual text.
+    -- DiagnosticUnderlineError   { DiagnosticVirtualTextError} , -- Used to underline "Error" diagnostics.
+    -- DiagnosticUnderlineWarn    {  } , -- Used to underline "Warn" diagnostics.
+    -- DiagnosticUnderlineInfo    { DiagnosticVirtualTextInfo } , -- Used to underline "Info" diagnostics.
+    -- DiagnosticUnderlineHint    { DiagnosticVirtualTextHint } , -- Used to underline "Hint" diagnostics.
+    -- DiagnosticUnderlineOk      { DiagnosticVirtualTextOk   } , -- Used to underline "Ok" diagnostics.
+    DiagnosticFloatingError    { DiagnosticVirtualTextError} , -- Used to color "Error" diagnostic messages in diagnostics float. See |vim.diagnostic.open_float()|
+    DiagnosticFloatingWarn     { DiagnosticVirtualTextWarn } , -- Used to color "Warn" diagnostic messages in diagnostics float.
+    DiagnosticFloatingInfo     { DiagnosticVirtualTextInfo } , -- Used to color "Info" diagnostic messages in diagnostics float.
+    DiagnosticFloatingHint     { DiagnosticVirtualTextHint } , -- Used to color "Hint" diagnostic messages in diagnostics float.
+    DiagnosticFloatingOk       { DiagnosticVirtualTextOk   } , -- Used to color "Ok" diagnostic messages in diagnostics float.
+    DiagnosticSignError        { DiagnosticVirtualTextError, bg = get_color("gray", 950) } , -- Used for "Error" signs in sign column.
+    DiagnosticSignWarn         { DiagnosticVirtualTextWarn,  bg = get_color("gray", 950) } , -- Used for "Warn" signs in sign column.
+    DiagnosticSignInfo         { DiagnosticVirtualTextInfo,  bg = get_color("gray", 950) } , -- Used for "Info" signs in sign column.
+    DiagnosticSignHint         { DiagnosticVirtualTextHint,  bg = get_color("gray", 950) } , -- Used for "Hint" signs in sign column.
+    DiagnosticSignOk           { DiagnosticVirtualTextOk,  bg = get_color("gray", 950) } , -- Used for "Ok" signs in sign column.
 
     -- Tree-Sitter syntax groups.
     --
@@ -286,6 +361,86 @@ local theme = lush(function(injected_functions)
     -- sym"@preproc"           { }, -- PreProc
     -- sym"@debug"             { }, -- Debug
     -- sym"@tag"               { }, -- Tag
+  rubySymbol { fg = get_color("sky") },
+  rubyTestMacro { rubySymbol },
+  rubyDefine { fg = get_color("sky"), gui = "underline" },
+  rubyRegexp { fg = get_color("sky"), gui = "italic" },
+  rubyRegexpCharClass { rubyRegexp },
+  rubyStringDelimiter { String },
+  rubyFunction { fg = get_color("purple")},
+  rubyInstanceVariable { fg = get_color("purple") },
+  rubyPseudoVariable { fg = get_color("chartreuse") },
+  rubyClass { fg = get_color("magenta"), gui = "underline" },
+  rubyModule { rubyClass },
+  rubyException { rubyClass },
+  rubyConstant { Constant  },
+  sym"@lsp.type.namespace" { rubyConstant },
+  rubyClassName { rubyConstant },
+  rubyArrayDelimiter { fg = get_color("red") },
+  rubyCurlyBlockDelimiter { rubyArrayDelimiter },
+  rubyControl { fg = get_color("orange") },
+  rubyBlockParameter { rubyControl },
+  rubyBlockParameterList { rubyControl },
+  rubyInterpolation { fg = get_color("sky") },
+  rubyInterpolationDelimiter { rubyInterpolation},
+  rubyMagicComment { fg = get_color("sky"), gui = "italic"  },
+  rubyAssertion { fg = get_color("chartreuse"), gui = "italic" },
+  rubyTestHelper { fg = get_color("chartreuse") },
+  rubyRegexpDelimiter { fg = get_color("chartreuse"), gui = "italic" },
+  rubyAccess { rubyClass },
+  rubyCallback { Macro },
+  rubyValidation { Macro },
+  rubyEntity { Macro },
+  rubyEntities { Macro },
+  rubyKeyword { Macro },
+  htmlTag { fg = get_color("sky", "light") },
+  htmlArg { htmlTag, gui = "underline" },
+  erubyExpression { Normal },
+  erubyBlock { erubyExpression },
+
+  typeScriptVariable { fg = get_color("purple") },
+
+  sym"@lsp.type.class.javascript" { fg = get_color("orange") },
+  sym"@lsp.mod.readonly.javascript" { fg = get_color("orange") },
+
+  TelescopeNormal { NormalFloat },
+  TelescopeBorder { NormalFloat, fg = get_color("sky") },
+  TelescopeMatching { fg = get_color("magenta") },
+  TelescopeSelection { bg = get_color("gray", 700), fg = get_color("yellow") },
+  TelescopePromptBorder { TelescopeBorder },
+  TelescopePromptBorder { TelescopeBorder},
+
+  NeoTreeDotFile { fg = get_color("gray", 500) },
+  NeoTreeGitAdded { fg = get_color("green"), gui = "italic" },
+  NeoTreeGitModified { fg = get_color("yellow"), gui = "italic" },
+
+  NotifyERRORBorder { NormalFloat, fg = get_color("red", "bold") },
+  NotifyERRORBody { NormalFloat },
+  NotifyERRORIcon { NormalFloat },
+  NotifyERRORTitle { NormalFloat },
+
+  NotifyWARNBorder { NormalFloat, fg = get_color("yellow", "bold") },
+  NotifyWARNBody { NormalFloat },
+  NotifyWARNIcon { NormalFloat },
+  NotifyWARNTitle { NormalFloat },
+
+  NotifyINFOBorder { NormalFloat, fg = get_color("sky") },
+  NotifyINFOBody { NormalFloat },
+  NotifyINFOIcon { NormalFloat },
+  NotifyINFOTitle { NormalFloat },
+
+  NotifyDEBUGBorder { NormalFloat, fg = get_color("orange") },
+  NotifyDEBUGBody { NormalFloat },
+  NotifyDEBUGIcon { NormalFloat },
+  NotifyDEBUGTitle { NormalFloat },
+
+  NotifyTRACEBorder { NormalFloat, fg = get_color("green") },
+  NotifyTRACEBody { NormalFloat },
+  NotifyTRACEIcon { NormalFloat },
+  NotifyTRACETitle { NormalFloat },
+
+  NotifyLogTime { NormalFloat },
+  NotifyLogTitle { NormalFloat },
 }
 end)
 
