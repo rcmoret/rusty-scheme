@@ -45,8 +45,6 @@
 local lush = require('lush')
 local hsl = lush.hsl
 
-local base = hsl(232, 90, 68)
-
 local colors = {
   orange = {
     primary = hsl(22, 100, 73),
@@ -55,7 +53,6 @@ local colors = {
   },
   yellow = {
     primary = hsl(52, 40, 67),
-    -- primary = hsl(52, 84, 87),
     bold = hsl(52, 100, 75),
   },
   chartreuse = {
@@ -69,20 +66,21 @@ local colors = {
   },
   sky = {
     primary = hsl(202, 70, 68),
-    -- primary = hsl(202, 90, 68),
     light = hsl(202, 70, 82),
     ultralight = hsl(202, 100, 96)
   },
   blue = { primary = hsl(232, 100, 73), },
   purple = {
     primary = hsl(262, 67, 77),
-    test = base.rotate(30).li(28).sa(10),
+    light = hsl(262, 67, 77).li(20)
   },
-  fuchsia = { primary = base.rotate(60).da(-3).sa(10)  },
-  magenta = { primary = hsl(322, 50, 74) },
+  magenta = {
+    primary = hsl(322, 50, 74),
+    bold = hsl(322, 60, 60),
+  },
   red = {
-    primary = hsl(352, 80, 68),
-    bold = hsl(352, 70, 42),
+    primary = hsl(352, 68, 70),
+    bold = hsl(352, 66, 60),
   },
   gray = {
     [0] = hsl(202, 8, 98),
@@ -104,7 +102,6 @@ local get_color = function(name, supplied_variant)
   local variant = supplied_variant or "primary"
   return colors[name][variant]
 end
-
 
 -- LSP/Linters mistakenly show `undefined global` errors in the spec, they may
 -- support an annotation like the following. Consult your server documentation.
@@ -148,12 +145,12 @@ local theme = lush(function(injected_functions)
     GitSignsDelete { SignColumn, fg = get_color("red", "bold") },
     -- IncSearch      { }, -- 'incsearch' highlighting; also used for the text replaced with ":s///c"
     -- Substitute     { }, -- |:substitute| replacement text highlighting
-    -- LineNr         { bg = colors.gray[950], fg = get_color("cyan") }, -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
-    LineNr         { bg = colors.gray[950], fg = get_color("orange", "dark_variant") }, -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
-    -- LineNrAbove    { bg = colors.gray[950], fg = get_color("orange", "dark_variant") }, -- Line number for when the 'relativenumber' option is set, above the cursor line
-    -- LineNrBelow    { bg = colors.gray[950], fg = get_color("orange", "dark_variant") }, -- Line number for when the 'relativenumber' option is set, below the cursor line
-    -- CursorLineNr   { bg = colors.gray[950], fg = get_color("gray", 200) }, -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
-    CursorLineNr   { bg = colors.gray[950], fg = get_color("orange", "secondary") }, -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
+    -- LineNr         { bg = get_color("gray", 950), fg = get_color("cyan") }, -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
+    LineNr         { bg = get_color("gray", 950), fg = get_color("orange", "dark_variant") }, -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
+    -- LineNrAbove    { bg = get_color("gray", 950), fg = get_color("orange", "dark_variant") }, -- Line number for when the 'relativenumber' option is set, above the cursor line
+    -- LineNrBelow    { bg = get_color("gray", 950), fg = get_color("orange", "dark_variant") }, -- Line number for when the 'relativenumber' option is set, below the cursor line
+    -- CursorLineNr   { bg = get_color("gray", 950), fg = get_color("gray", 200) }, -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
+    CursorLineNr   { bg = get_color("gray", 950), fg = get_color("orange", "secondary") }, -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
     -- CursorLineFold { }, -- Like FoldColumn when 'cursorline' is set for the cursor line
     -- CursorLineSign { }, -- Like SignColumn when 'cursorline' is set for the cursor line
     -- MatchParen     { }, -- Character under the cursor or just before it, if it is a paired bracket, and its match. |pi_paren.txt|
@@ -192,7 +189,7 @@ local theme = lush(function(injected_functions)
     TabLine        { NormalFloat }, -- Tab pages line, not active tab page label
     TabLineFill    { NormalFloat }, -- Tab pages line, where there are no labels
     -- TabLineSel     { }, -- Tab pages line, active tab page label
-    -- Title          { }, -- Titles for output from ":set all", ":autocmd" etc.
+    Title          { fg = get_color("chartreuse") }, -- Titles for output from ":set all", ":autocmd" etc.
     Visual         { bg = get_color("gray", 700) }, -- Visual mode selection
     VisualNOS      { Visual }, -- Visual mode selection when vim is "Not Owning the Selection".
     WarningMsg     { Visual }, -- Warning messages
@@ -214,17 +211,16 @@ local theme = lush(function(injected_functions)
     --
     -- Uncomment and edit if you want more specific syntax highlighting.
 
-    Comment        { fg = get_color("gray", 600), gui = "italic" }, -- Any comment
+    Comment        { fg = get_color("gray", 600) }, -- Any comment
 
-    PreProc        { fg = get_color("purple").li(20) }, -- (*) Generic Preprocessor
+    PreProc        { fg = get_color("purple", "light") }, -- (*) Generic Preprocessor
     Constant       { fg = get_color("chartreuse") }, -- (*) Any constant
-    -- Constant       { fg = get_color("chartreuse").li(30).de(50) }, -- (*) Any constant
     String         { fg = get_color("blue") }, --   A string constant: "this is a string"
     Number         { fg = get_color("blue") }, --   A number constant: 234, 0xff
     Boolean        { fg = get_color("red"), gui = "italic" }, --   A boolean constant: TRUE, fals
     Identifier     { fg = get_color("sky") },
 
-    Function       { fg = get_color("gray", 0) }, --   Function name (also: methods for classes)
+    Function       { fg = get_color("sky") }, --   Function name (also: methods for classes)
 
     Statement      { fg = get_color("orange", "secondary") }, -- (*) Any statement
     Character      { fg = get_color("gray", 200) }, --   A character constant: 'c', '\n'
@@ -237,20 +233,20 @@ local theme = lush(function(injected_functions)
 
     -- PreProc        { }, -- (*) Generic Preprocessor
     Include        { fg = get_color("yellow"), gui = "italic" }, --   Preprocessor #include
-    Define         { fg = get_color("magenta"), gui = "undercurl" }, --   Preprocessor #define
+    Define         { fg = get_color("magenta") }, --   Preprocessor #define
     Macro          { fg = get_color("yellow"),  gui = "italic" }, --   Same as Define
     -- PreCondit      { }, --   Preprocessor #if, #else, #endif, etc.
 
-    -- Type           { }, -- (*) int, long, char, etc.
+    Type           { fg = get_color("chartreuse") }, -- (*) int, long, char, etc.
     -- StorageClass   { }, --   static, register, volatile, etc.
     -- Structure      { }, --   struct, union, enum, etc.
     -- Typedef        { }, --   A typedef
 
-    -- Special        { }, -- (*) Any special symbol
-    -- SpecialChar    { }, --   Special character in a constant
+    Special        { fg = get_color("yellow") }, -- (*) Any special symbol
+    SpecialChar    { fg = get_color("orange") }, --   Special character in a constant
     -- Tag            { }, --   You can use CTRL-] on this
     -- Delimiter      { }, --   Character that needs attention
-    -- SpecialComment { }, --   Special things inside a comment (e.g. '\n')
+    SpecialComment { fg = get_color("sky"), gui = "italic" }, --   Special things inside a comment (e.g. '\n')
     -- Debug          { }, --   Debugging statements
 
     Underlined     { gui = "underline" }, -- Text that stands out, HTML links
@@ -273,26 +269,26 @@ local theme = lush(function(injected_functions)
 
     -- See :h diagnostic-highlights, some groups may not be listed, submit a PR fix to lush-template!
     --
-    DiagnosticError            {  } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
-    DiagnosticWarn             {  } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
-    DiagnosticInfo             {  } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
-    DiagnosticHint             {  } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
-    DiagnosticOk               {  } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
+    DiagnosticError            { gui = "non" } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
+    DiagnosticWarn             { gui = "non" } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
+    DiagnosticInfo             { gui = "non" } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
+    DiagnosticHint             { fg = get_color("purple"), gui = "none" } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
+    DiagnosticOk               { gui = "none" } , -- Used as the base highlight group. Other Diagnostic highlights link to this by default (except Underline)
     DiagnosticVirtualTextError { fg = get_color("red", "bold") } , -- Used for "Error" diagnostic virtual text.
-    DiagnosticVirtualTextWarn  { fg = get_color("yellow", "bold"), gui = "italic" } , -- Used for "Warn" diagnostic virtual text.
-    DiagnosticVirtualTextInfo  { fg = get_color("sky") } , -- Used for "Info" diagnostic virtual text.
-    DiagnosticVirtualTextHint  { fg = get_color("purple")} , -- Used for "Hint" diagnostic virtual text.
+    DiagnosticVirtualTextWarn  { fg = get_color("yellow", "bold") } , -- Used for "Warn" diagnostic virtual text.
+    DiagnosticVirtualTextInfo  { fg = get_color("magenta", "bold") } , -- Used for "Info" diagnostic virtual text.
+    DiagnosticVirtualTextHint  { fg = get_color("purple") } , -- Used for "Hint" diagnostic virtual text.
     DiagnosticVirtualTextOk    { fg = get_color("chartreuse") } , -- Used for "Ok" diagnostic virtual text.
-    -- DiagnosticUnderlineError   { DiagnosticVirtualTextError} , -- Used to underline "Error" diagnostics.
-    -- DiagnosticUnderlineWarn    {  } , -- Used to underline "Warn" diagnostics.
-    -- DiagnosticUnderlineInfo    { DiagnosticVirtualTextInfo } , -- Used to underline "Info" diagnostics.
-    -- DiagnosticUnderlineHint    { DiagnosticVirtualTextHint } , -- Used to underline "Hint" diagnostics.
-    -- DiagnosticUnderlineOk      { DiagnosticVirtualTextOk   } , -- Used to underline "Ok" diagnostics.
-    DiagnosticFloatingError    { DiagnosticVirtualTextError} , -- Used to color "Error" diagnostic messages in diagnostics float. See |vim.diagnostic.open_float()|
-    DiagnosticFloatingWarn     { DiagnosticVirtualTextWarn } , -- Used to color "Warn" diagnostic messages in diagnostics float.
-    DiagnosticFloatingInfo     { DiagnosticVirtualTextInfo } , -- Used to color "Info" diagnostic messages in diagnostics float.
-    DiagnosticFloatingHint     { DiagnosticVirtualTextHint } , -- Used to color "Hint" diagnostic messages in diagnostics float.
-    DiagnosticFloatingOk       { DiagnosticVirtualTextOk   } , -- Used to color "Ok" diagnostic messages in diagnostics float.
+    DiagnosticUnderlineError   { gui = "undercurl" } , -- Used to underline "Error" diagnostics.
+    DiagnosticUnderlineWarn    { gui = "undercurl"  } , -- Used to underline "Warn" diagnostics.
+    DiagnosticUnderlineInfo    { gui = "undercurl" } , -- Used to underline "Info" diagnostics.
+    DiagnosticUnderlineHint    { gui = "underculr" } , -- Used to underline "Hint" diagnostics.
+    DiagnosticUnderlineOk      { DiagnosticVirtualTextOk   } , -- Used to underline "Ok" diagnostics.
+    DiagnosticFloatingError    { fg = get_color("red", "bold") } , -- Used to color "Error" diagnostic messages in diagnostics float. See |vim.diagnostic.open_float()|
+    DiagnosticFloatingWarn     { fg = get_color("yellow", "bold")  } , -- Used to color "Warn" diagnostic messages in diagnostics float.
+    DiagnosticFloatingInfo     { fg = get_color("sky")  } , -- Used to color "Info" diagnostic messages in diagnostics float.
+    DiagnosticFloatingHint     { fg = get_color("purple")  } , -- Used to color "Hint" diagnostic messages in diagnostics float.
+    DiagnosticFloatingOk       { fg = get_color("chartreuse")    } , -- Used to color "Ok" diagnostic messages in diagnostics float.
     DiagnosticSignError        { DiagnosticVirtualTextError, bg = get_color("gray", 950) } , -- Used for "Error" signs in sign column.
     DiagnosticSignWarn         { DiagnosticVirtualTextWarn,  bg = get_color("gray", 950) } , -- Used for "Warn" signs in sign column.
     DiagnosticSignInfo         { DiagnosticVirtualTextInfo,  bg = get_color("gray", 950) } , -- Used for "Info" signs in sign column.
@@ -316,36 +312,36 @@ local theme = lush(function(injected_functions)
     --
     -- For more information see https://github.com/rktjmp/lush.nvim/issues/109
 
-    -- sym"@text.literal"      { }, -- Comment
-    -- sym"@text.reference"    { }, -- Identifier
-    -- sym"@text.title"        { }, -- Title
-    -- sym"@text.uri"          { }, -- Underlined
-    -- sym"@text.underline"    { }, -- Underlined
-    -- sym"@text.todo"         { }, -- Todo
-    -- sym"@comment"           { }, -- Comment
-    -- sym"@punctuation"       { }, -- Delimiter
-    -- sym"@constant"          { }, -- Constant
-    -- sym"@constant.builtin"  { }, -- Special
-    -- sym"@constant.macro"    { }, -- Define
-    -- sym"@define"            { }, -- Define
-    -- sym"@macro"             { }, -- Macro
-    -- sym"@string"            { }, -- String
-    -- sym"@string.escape"     { }, -- SpecialChar
-    -- sym"@string.special"    { }, -- SpecialChar
-    -- sym"@character"         { }, -- Character
-    -- sym"@character.special" { }, -- SpecialChar
-    -- sym"@number"            { }, -- Number
-    -- sym"@boolean"           { }, -- Boolean
-    -- sym"@float"             { }, -- Float
-    -- sym"@function"          { }, -- Function
-    -- sym"@function.builtin"  { }, -- Special
-    -- sym"@function.macro"    { }, -- Macro
-    -- sym"@parameter"         { }, -- Identifier
-    -- sym"@method"            { }, -- Function
-    -- sym"@field"             { }, -- Identifier
-    -- sym"@property"          { }, -- Identifier
-    -- sym"@constructor"       { }, -- Special
-    -- sym"@conditional"       { }, -- Conditional
+    sym"@text.literal"      { String },
+    sym"@text.reference"    { Identifier },
+    sym"@text.title"        { Title },
+    sym"@text.uri"          { fg = get_color("purple"), gui = "underline" },
+    sym"@text.underline"    { Underlined },
+    sym"@text.todo"         { Todo },
+    sym"@comment"           { Comment },
+    sym"@punctuation"       { fg = get_color("red") },
+    sym"@constant"          { Constant },
+    sym"@constant.builtin"  { fg = get_color("blue") },
+    sym"@constant.macro"    { fg = get_color("yellow"), gui = "italic" },
+    sym"@define"            { Define },
+    sym"@macro"             { Macro },
+    sym"@string"            { String },
+    sym"@string.escape"     { SpecialChar },
+    sym"@string.special"    { SpecialChar },
+    sym"@character"         { Character },
+    sym"@character.special" { SpecialChar },
+    sym"@number"            { Number },
+    sym"@boolean"           { Boolean },
+    sym"@float"             { Number },
+    sym"@function"          { Function },
+    sym"@function.builtin"  { Special },
+    sym"@function.macro"    { Macro },
+    sym"@parameter"         { Identifier },
+    sym"@method"            { Function },
+    sym"@field"             { Identifier },
+    sym"@property"          { Identifier },
+    sym"@constructor"       { Special },
+    sym"@conditional"       { Conditional },
     -- sym"@repeat"            { }, -- Repeat
     -- sym"@label"             { }, -- Label
     -- sym"@operator"          { }, -- Operator
@@ -362,7 +358,6 @@ local theme = lush(function(injected_functions)
     -- sym"@debug"             { }, -- Debug
     -- sym"@tag"               { }, -- Tag
   rubySymbol { fg = get_color("sky") },
-  rubyTestMacro { rubySymbol },
   rubyDefine { fg = get_color("sky"), gui = "underline" },
   rubyRegexp { fg = get_color("sky"), gui = "italic" },
   rubyRegexpCharClass { rubyRegexp },
@@ -384,8 +379,9 @@ local theme = lush(function(injected_functions)
   rubyInterpolation { fg = get_color("sky") },
   rubyInterpolationDelimiter { rubyInterpolation},
   rubyMagicComment { fg = get_color("sky"), gui = "italic"  },
-  rubyAssertion { fg = get_color("chartreuse"), gui = "italic" },
-  rubyTestHelper { fg = get_color("chartreuse") },
+  rubyAssertion { fg = get_color("purple", "light"), gui = "italic" },
+  rubyTestMacro { fg = get_color("sky", "light") },
+  rubyTestHelper { fg = get_color("chartreuse").li(30) },
   rubyRegexpDelimiter { fg = get_color("chartreuse"), gui = "italic" },
   rubyAccess { rubyClass },
   rubyCallback { Macro },
@@ -408,7 +404,7 @@ local theme = lush(function(injected_functions)
   TelescopeMatching { fg = get_color("magenta") },
   TelescopeSelection { bg = get_color("gray", 700), fg = get_color("yellow") },
   TelescopePromptBorder { TelescopeBorder },
-  TelescopePromptBorder { TelescopeBorder},
+  TelescopePromptCounter { fg = get_color("gray", 200) },
 
   NeoTreeDotFile { fg = get_color("gray", 500) },
   NeoTreeGitAdded { fg = get_color("green"), gui = "italic" },
