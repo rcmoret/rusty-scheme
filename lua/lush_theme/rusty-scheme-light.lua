@@ -44,6 +44,63 @@
 
 local lush = require('lush')
 local hsl = lush.hsl
+local colors = {
+  orange = {
+    primary = hsl(22, 100, 73),
+    secondary = hsl(22, 100, 78),
+    dark_variant = hsl(22, 20, 35)
+  },
+  yellow = {
+    primary = hsl(52, 80, 76),
+    bold = hsl(52, 100, 75),
+  },
+  chartreuse = {
+    primary = hsl(112, 100, 17),
+  },
+  green = {
+    primary = hsl(142, 100, 14),
+  },
+  cyan = {
+    primary = hsl(172, 100, 20),
+  },
+  sky = {
+    primary = hsl(202, 80, 88),
+    light = hsl(202, 70, 82),
+    ultralight = hsl(202, 100, 96)
+  },
+  blue = { primary = hsl(232, 100, 37), },
+  purple = {
+    light = hsl(262, 72, 72),
+    primary = hsl(262, 50, 42)
+  },
+  fuchsia = {
+    primary = hsl(292, 40, 48),
+  },
+  magenta = { primary = hsl(322, 50, 74) },
+  red = {
+    primary = hsl(352, 80, 68),
+    bold = hsl(352, 70, 42),
+  },
+  gray = {
+    [0] = hsl(202, 12, 82),
+    [100] = hsl(202, 8, 75),
+    [200] = hsl(202, 10, 65),
+    [300] = hsl(202, 20, 60),
+    [400] = hsl(202, 20, 50),
+    [500] = hsl(202, 20, 45),
+    [600] = hsl(202, 20, 35),
+    [700] = hsl(202, 22, 25),
+    [800] = hsl(202, 22, 20),
+    [900] = hsl(202, 24, 17),
+    [950] = hsl(202, 25, 13),
+    [1000] = hsl(202, 30, 10)
+  }
+}
+
+local get_color = function(name, supplied_variant)
+  local variant = supplied_variant or "primary"
+  return colors[name][variant]
+end
 
 -- LSP/Linters mistakenly show `undefined global` errors in the spec, they may
 -- support an annotation like the following. Consult your server documentation.
@@ -63,8 +120,8 @@ local theme = lush(function(injected_functions)
     --
     -- ColorColumn    { }, -- Columns set with 'colorcolumn'
     -- Conceal        { }, -- Placeholder characters substituted for concealed text (see 'conceallevel')
-    -- Cursor         { }, -- Character under the cursor
-    -- CurSearch      { }, -- Highlighting a search pattern under the cursor (see 'hlsearch')
+    Cursor         { bg = get_color("gray", 950) }, -- Character under the cursor
+    CurSearch      { bg = get_color("sky", "light") }, -- Highlighting a search pattern under the cursor (see 'hlsearch')
     -- lCursor        { }, -- Character under the cursor when |language-mapping| is used (see 'guicursor')
     -- CursorIM       { }, -- Like Cursor, but used when in IME mode |CursorIM|
     -- CursorColumn   { }, -- Screen-column at the cursor, when 'cursorcolumn' is set.
@@ -84,22 +141,22 @@ local theme = lush(function(injected_functions)
     -- SignColumn     { }, -- Column where |signs| are displayed
     -- IncSearch      { }, -- 'incsearch' highlighting; also used for the text replaced with ":s///c"
     -- Substitute     { }, -- |:substitute| replacement text highlighting
-    -- LineNr         { }, -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
+    LineNr         { bg = get_color("gray", 100), fg = get_color("purple", "light") }, -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
     -- LineNrAbove    { }, -- Line number for when the 'relativenumber' option is set, above the cursor line
     -- LineNrBelow    { }, -- Line number for when the 'relativenumber' option is set, below the cursor line
-    -- CursorLineNr   { }, -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
+    CursorLineNr   { bg = get_color("gray", 100), fg = get_color("purple") }, -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
     -- CursorLineFold { }, -- Like FoldColumn when 'cursorline' is set for the cursor line
     -- CursorLineSign { }, -- Like SignColumn when 'cursorline' is set for the cursor line
     -- MatchParen     { }, -- Character under the cursor or just before it, if it is a paired bracket, and its match. |pi_paren.txt|
     -- ModeMsg        { }, -- 'showmode' message (e.g., "-- INSERT -- ")
     -- MsgArea        { }, -- Area for messages and cmdline
-    -- MsgSeparator   { }, -- Separator for scrolled messages, `msgsep` flag of 'display'
     -- MoreMsg        { }, -- |more-prompt|
     -- NonText        { }, -- '@' at the end of the window, characters from 'showbreak' and other characters that do not really exist in the text (e.g., ">" displayed when a double-wide character doesn't fit at the end of the line). See also |hl-EndOfBuffer|.
-    -- Normal         { }, -- Normal text
-    -- NormalFloat    { }, -- Normal text in floating windows.
-    -- FloatBorder    { }, -- Border of floating windows.
-    -- FloatTitle     { }, -- Title of floating windows.
+    Normal         { bg = get_color("gray", 0), fg = get_color("gray", 800) }, -- Normal text
+    NormalFloat    { bg = get_color("gray", 100) }, -- Normal text in floating windows.
+    FloatBorder    { bg = get_color("gray", 100), fg = get_color("fuchsia") }, -- Border of floating windows.
+    FloatTitle     { NormalFloat }, -- Title of floating windows.
+    MsgSeparator   { NormalFloat }, -- Separator for scrolled messages, `msgsep` flag of 'display'
     -- NormalNC       { }, -- normal text in non-current windows
     -- Pmenu          { }, -- Popup menu: Normal item.
     -- PmenuSel       { }, -- Popup menu: Selected item.
@@ -111,7 +168,7 @@ local theme = lush(function(injected_functions)
     -- PmenuThumb     { }, -- Popup menu: Thumb of the scrollbar.
     -- Question       { }, -- |hit-enter| prompt and yes/no questions
     -- QuickFixLine   { }, -- Current |quickfix| item in the quickfix window. Combined with |hl-CursorLine| when the cursor is there.
-    -- Search         { }, -- Last search pattern highlighting (see 'hlsearch'). Also used for similar items that need to stand out.
+    Search         { CurSearch }, -- Last search pattern highlighting (see 'hlsearch'). Also used for similar items that need to stand out.
     -- SpecialKey     { }, -- Unprintable characters: text displayed differently from what it really is. But not 'listchars' whitespace. |hl-Whitespace|
     -- SpellBad       { }, -- Word that is not recognized by the spellchecker. |spell| Combined with the highlighting used otherwise.
     -- SpellCap       { }, -- Word that should start with a capital. |spell| Combined with the highlighting used otherwise.
@@ -142,15 +199,15 @@ local theme = lush(function(injected_functions)
 
     -- Comment        { }, -- Any comment
 
-    -- Constant       { }, -- (*) Any constant
-    -- String         { }, --   A string constant: "this is a string"
+    Constant       { fg = get_color("cyan"), gui = "bold" }, -- (*) Any constant
+    String         { fg = get_color("blue") }, --   A string constant: "this is a string"
     -- Character      { }, --   A character constant: 'c', '\n'
-    -- Number         { }, --   A number constant: 234, 0xff
+    Number         { String }, --   A number constant: 234, 0xff
     -- Boolean        { }, --   A boolean constant: TRUE, false
     -- Float          { }, --   A floating point constant: 2.3e10
 
     -- Identifier     { }, -- (*) Any variable name
-    -- Function       { }, --   Function name (also: methods for classes)
+    Function       { fg = get_color("gray", 800) }, --   Function name (also: methods for classes)
 
     -- Statement      { }, -- (*) Any statement
     -- Conditional    { }, --   if, then, else, endif, switch, etc.
@@ -286,6 +343,44 @@ local theme = lush(function(injected_functions)
     -- sym"@preproc"           { }, -- PreProc
     -- sym"@debug"             { }, -- Debug
     -- sym"@tag"               { }, -- Tag
+  TelescopeNormal { NormalFloat },
+  TelescopeBorder { NormalFloat, fg = get_color("fuchsia") },
+  TelescopeMatching { fg = get_color("fuchsia") },
+  TelescopeSelection { bg = get_color("gray", 300), fg = get_color("yellow") },
+  TelescopePromptBorder { TelescopeBorder },
+  TelescopePromptPrefix { TelescopeBorder },
+
+  NeoTreeDotFile { fg = get_color("gray", 500) },
+  NeoTreeGitAdded { fg = get_color("green"), gui = "italic" },
+  NeoTreeGitModified { fg = get_color("yellow"), gui = "italic" },
+
+  NotifyERRORBorder { NormalFloat, fg = get_color("red", "bold") },
+  NotifyERRORBody { NormalFloat },
+  NotifyERRORIcon { NormalFloat },
+  NotifyERRORTitle { NormalFloat },
+
+  NotifyWARNBorder { NormalFloat, fg = get_color("yellow", "bold") },
+  NotifyWARNBody { NormalFloat },
+  NotifyWARNIcon { NormalFloat },
+  NotifyWARNTitle { NormalFloat },
+
+  NotifyINFOBorder { NormalFloat, fg = get_color("sky") },
+  NotifyINFOBody { NormalFloat },
+  NotifyINFOIcon { NormalFloat },
+  NotifyINFOTitle { NormalFloat },
+
+  NotifyDEBUGBorder { NormalFloat, fg = get_color("orange") },
+  NotifyDEBUGBody { NormalFloat },
+  NotifyDEBUGIcon { NormalFloat },
+  NotifyDEBUGTitle { NormalFloat },
+
+  NotifyTRACEBorder { NormalFloat, fg = get_color("green") },
+  NotifyTRACEBody { NormalFloat },
+  NotifyTRACEIcon { NormalFloat },
+  NotifyTRACETitle { NormalFloat },
+
+  NotifyLogTime { NormalFloat },
+  NotifyLogTitle { NormalFloat },
 }
 end)
 
